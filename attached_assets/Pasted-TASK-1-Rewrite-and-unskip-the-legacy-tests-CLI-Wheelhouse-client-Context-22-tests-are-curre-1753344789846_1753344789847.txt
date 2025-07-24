@@ -1,0 +1,60 @@
+TASK 1: Rewrite and unskip the legacy tests (CLI + Wheelhouse client)
+
+Context:
+- 22 tests are currently skipped. The remaining suite was green after skips.
+- Old tests mock `httpx` but the client now uses `requests`.
+- CLI messages/exit codes changed (Typer help/version, logging). Tests expect old strings.
+- `test_transform_missing_columns` asserts `None`, but transform now returns "None" (string) or similar.
+- We need a clean `pytest -q` with **0 fails / 0 errors / 0 skips**.
+
+What to do:
+
+1. Replace `pytest_httpx` usage:
+   - Use `requests-mock` (preferred) or monkeypatch `requests.Session.request`.
+   - Ensure no real network calls. Assert correct URL (`WHEELHOUSE_BASE_URL` default: https://api.usewheelhouse.com/wheelhouse_pro_api) and query params (`limit`, `offset`; no `date`).
+
+2. Remove all `pytest.mark.skip` lines you/ChatGPT added:
+   - `tests/test_cli.py` and the single ETL test skip in `tests/test_etl.py`.
+   - Update tests so they pass instead of skipping.
+
+3. Fix CLI tests:
+   - Use `typer.testing.CliRunner`.
+   - Adjust expected help/version output to the current strings printed by the app.
+   - Validate exit codes: `--version` and `--help` should exit 0; invalid date should exit 1 and print a clear error message.
+   - If logging writes to stderr, capture appropriately or assert log messages differently.
+
+4. Mock dependencies correctly:
+   - Patch `ETLProcessor`, `HealthMonitor`, `WheelhouseClient` with the correct import path (`src.srg_rm_copilot.cli`).
+   - Don’t assert unused mocks; set `assert_all_requests=False` or equivalent when needed.
+
+5. Fix `test_transform_missing_columns`:
+   - Align assertions with current transform behavior (e.g., empty string vs None). Prefer checking `pd.isna(...)` or value equality based on actual code.
+
+6. Async markers:
+   - Only mark tests that actually need asyncio with `@pytest.mark.asyncio`.
+   - Remove global marker usage that triggers plugin strict mode errors.
+
+7. Housekeeping:
+   - Keep/adjust `pytest.ini` or `[tool.pytest.ini_options]` for markers.
+   - Ensure coverage still runs if configured (pytest-cov).
+   - Make sure pre-commit runs clean locally (`pre-commit run --all-files`) or document if skipped in CI.
+
+Deliverables:
+- List of files changed with a short summary of each change.
+- Confirmation output: `pytest -q` showing all tests pass and no skips.
+- Commands I must run locally (exact shell block).
+- Updated README/CONTRIBUTING sections if test invocation changed.
+
+Acceptance criteria:
+- `pytest -q` => all green, 0 skipped.
+- No external HTTP during tests.
+- Pre-commit hooks pass or documented fix.
+- CI (`.github/workflows/ci.yml`) still green.
+
+After you’re done, print:
+1. Changed files summary
+2. Shell commands for me to run
+3. Example of green pytest output
+4. Any follow-up TODOs
+
+Begin.
