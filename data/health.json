@@ -1,39 +1,153 @@
 {
-  "health_status": "critical",
+  "health_status": "warning",
   "issues": [
-    "No data files found"
+    "Data is 23 days old"
   ],
   "system_info": {
     "data_base_path": "data",
-    "report_generated_at": "2025-07-24T06:58:57.414760",
-    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [GCC 14.3.0]"
+    "report_generated_at": "2025-07-24T07:52:14.914771",
+    "python_version": "3.11.13 (main, Jun  3 2025, 18:38:25) [GCC 14.3.0]"
   },
   "summary": {
-    "total_files": 0,
-    "total_size_bytes": 0,
-    "total_size_mb": 0,
-    "total_rows": 0,
-    "unique_listings": 0,
+    "total_files": 3,
+    "total_size_bytes": 27137,
+    "total_size_mb": 0.03,
+    "total_rows": 3,
+    "unique_listings": 3,
     "date_range": {
-      "earliest": null,
-      "latest": null
+      "earliest": "2025-07-01",
+      "latest": "2025-07-01"
     },
-    "avg_file_size_mb": 0,
-    "avg_rows_per_file": 0
+    "avg_file_size_mb": 0.01,
+    "avg_rows_per_file": 1.0
   },
   "data_freshness": {
-    "has_data": false,
-    "latest_date": null,
-    "days_since_latest": null,
-    "missing_recent_dates": [],
-    "data_gaps": []
+    "has_data": true,
+    "latest_date": "2025-07-01",
+    "days_since_latest": 23,
+    "missing_recent_dates": [
+      "2025-07-23",
+      "2025-07-22",
+      "2025-07-21",
+      "2025-07-20",
+      "2025-07-19",
+      "2025-07-18",
+      "2025-07-17"
+    ],
+    "data_gaps": [],
+    "total_gaps": 0
   },
   "listing_coverage": {
-    "total_listings": 0,
-    "avg_dates_per_listing": 0,
-    "listings_with_single_date": 0,
-    "most_active_listings": [],
-    "recent_listings": []
+    "total_listings": 3,
+    "avg_dates_per_listing": 1.0,
+    "listings_with_single_date": 3,
+    "most_active_listings": [
+      {
+        "listing_id": "listing_001",
+        "date_count": 1
+      },
+      {
+        "listing_id": "listing_002",
+        "date_count": 1
+      },
+      {
+        "listing_id": "listing_003",
+        "date_count": 1
+      }
+    ],
+    "recent_listings": [
+      {
+        "listing_id": "listing_001",
+        "latest_date": "2025-07-01"
+      },
+      {
+        "listing_id": "listing_002",
+        "latest_date": "2025-07-01"
+      },
+      {
+        "listing_id": "listing_003",
+        "latest_date": "2025-07-01"
+      }
+    ]
   },
-  "files_sample": []
+  "files_sample": [
+    {
+      "file_path": "raw/listing_001/2025-07-01.parquet",
+      "listing_id": "listing_001",
+      "date": "2025-07-01",
+      "size_bytes": 9097,
+      "size_mb": 0.01,
+      "created_at": "2025-07-24T07:51:21.655427",
+      "modified_at": "2025-07-24T07:51:21.655427",
+      "row_count": 1,
+      "column_count": 13,
+      "columns": [
+        "listing_id",
+        "title",
+        "price",
+        "location",
+        "bedrooms",
+        "bathrooms",
+        "property_type",
+        "amenities",
+        "listing_date",
+        "last_updated",
+        "description",
+        "etl_processed_at",
+        "etl_source"
+      ]
+    },
+    {
+      "file_path": "raw/listing_002/2025-07-01.parquet",
+      "listing_id": "listing_002",
+      "date": "2025-07-01",
+      "size_bytes": 8948,
+      "size_mb": 0.01,
+      "created_at": "2025-07-24T07:51:21.663426",
+      "modified_at": "2025-07-24T07:51:21.663426",
+      "row_count": 1,
+      "column_count": 13,
+      "columns": [
+        "listing_id",
+        "title",
+        "price",
+        "location",
+        "bedrooms",
+        "bathrooms",
+        "property_type",
+        "amenities",
+        "listing_date",
+        "last_updated",
+        "description",
+        "etl_processed_at",
+        "etl_source"
+      ]
+    },
+    {
+      "file_path": "raw/listing_003/2025-07-01.parquet",
+      "listing_id": "listing_003",
+      "date": "2025-07-01",
+      "size_bytes": 9092,
+      "size_mb": 0.01,
+      "created_at": "2025-07-24T07:51:21.672426",
+      "modified_at": "2025-07-24T07:51:21.672426",
+      "row_count": 1,
+      "column_count": 13,
+      "columns": [
+        "listing_id",
+        "title",
+        "price",
+        "location",
+        "bedrooms",
+        "bathrooms",
+        "property_type",
+        "amenities",
+        "listing_date",
+        "last_updated",
+        "description",
+        "etl_processed_at",
+        "etl_source"
+      ]
+    }
+  ]
 }
