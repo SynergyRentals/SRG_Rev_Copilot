@@ -1,0 +1,39 @@
+{
+  "health_status": "critical",
+  "issues": [
+    "No data files found"
+  ],
+  "system_info": {
+    "data_base_path": "data",
+    "report_generated_at": "2025-07-24T06:58:57.414760",
+    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [GCC 14.3.0]"
+  },
+  "summary": {
+    "total_files": 0,
+    "total_size_bytes": 0,
+    "total_size_mb": 0,
+    "total_rows": 0,
+    "unique_listings": 0,
+    "date_range": {
+      "earliest": null,
+      "latest": null
+    },
+    "avg_file_size_mb": 0,
+    "avg_rows_per_file": 0
+  },
+  "data_freshness": {
+    "has_data": false,
+    "latest_date": null,
+    "days_since_latest": null,
+    "missing_recent_dates": [],
+    "data_gaps": []
+  },
+  "listing_coverage": {
+    "total_listings": 0,
+    "avg_dates_per_listing": 0,
+    "listings_with_single_date": 0,
+    "most_active_listings": [],
+    "recent_listings": []
+  },
+  "files_sample": []
+}

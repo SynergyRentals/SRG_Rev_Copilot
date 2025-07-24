@@ -1,0 +1,63 @@
+name: Nightly ETL
+
+on:
+  schedule:
+    # Run at 02:00 America/Chicago (07:00 UTC during CDT, 08:00 UTC during CST)
+    - cron: '0 7 *'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  etl:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: "latest"
+
+    - name: Set up Python
+      run: uv python install 3.12
+
+    - name: Install dependencies
+      run: uv sync
+
+    - name: Create data directory
+      run: mkdir -p data
+
+    - name: Run ETL
+      env:
+        WHEELHOUSE_API_KEY: ${{ secrets.WHEELHOUSE_API_KEY }}
+        WHEELHOUSE_USER_API_KEY: ${{ secrets.WHEELHOUSE_USER_API_KEY }}
+      run: |
+        uv run python -m srg_rm_copilot etl
+
+    - name: Generate health report
+      run: |
+        uv run python scripts/health_check.py
+
+    - name: Commit and push health report
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/health.json
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "chore: update nightly health report $(date -u +%Y-%m-%d)"
+          git push
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: etl-data
+        path: |
+          data/health.json
+          data/raw/**/*.parquet
+        retention-days: 7
