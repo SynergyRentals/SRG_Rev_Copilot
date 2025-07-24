@@ -74,8 +74,7 @@ class WheelhouseClient:
         # Set default headers
         session.headers.update(self.config.wheelhouse_headers)
         
-        # Set timeout
-        session.timeout = self.config.etl_timeout
+        # Note: timeout will be set per-request in _make_request
         
         return session
     
@@ -118,6 +117,7 @@ class WheelhouseClient:
                 url=url,
                 params=params,
                 json=json_data,
+                timeout=self.config.etl_timeout,
             )
             
             # Handle rate limiting
@@ -133,10 +133,16 @@ class WheelhouseClient:
                     error_data = response.json()
                     if "error" in error_data:
                         error_msg += f": {error_data['error']}"
+                    elif "message" in error_data:
+                        error_msg += f": {error_data['message']}"
+                    else:
+                        error_msg += f": {str(error_data)}"
                 except Exception:
-                    error_msg += f": {response.text[:200]}"
+                    # Include full response text for debugging
+                    response_text = response.text[:500]  # Increased from 200
+                    error_msg += f": {response_text}"
                 
-                logger.error(error_msg)
+                logger.error(f"{error_msg} (URL: {url})")
                 raise WheelhouseAPIError(error_msg)
             
             logger.debug(f"Request successful: {response.status_code}")
@@ -157,7 +163,7 @@ class WheelhouseClient:
         Get listings for a specific date.
         
         Args:
-            date: Date in YYYY-MM-DD format
+            date: Date in YYYY-MM-DD format (kept for compatibility but not sent to API)
             limit: Number of listings to retrieve (max 100)
             offset: Offset for pagination
             filters: Additional filters to apply
@@ -166,7 +172,7 @@ class WheelhouseClient:
             API response containing listings data
         """
         params = {
-            "date": date,
+            # Note: date parameter removed per API requirements
             "limit": min(limit, 100),  # Ensure we don't exceed API limits
             "offset": offset,
         }
@@ -174,7 +180,7 @@ class WheelhouseClient:
         if filters:
             params.update(filters)
         
-        logger.info(f"Fetching listings for date {date} (limit={limit}, offset={offset})")
+        logger.info(f"Fetching listings (limit={limit}, offset={offset})")
         
         response = self._make_request("GET", "/listings", params=params)
         data = response.json()

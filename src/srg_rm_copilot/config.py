@@ -25,8 +25,17 @@ class Config(BaseModel):
     )
     
     wheelhouse_base_url: str = Field(
-        default="https://api.usewheelhouse.com/wheelhouse_pro_api",
+        default_factory=lambda: os.getenv(
+            "WHEELHOUSE_BASE_URL", 
+            "https://api.usewheelhouse.com/wheelhouse_pro_api"
+        ),
         description="Base URL for Wheelhouse API"
+    )
+    
+    # Mock mode configuration
+    wheelhouse_mock: bool = Field(
+        default_factory=lambda: os.getenv("WHEELHOUSE_MOCK", "0") == "1",
+        description="Enable mock mode to skip API calls and use fixture data"
     )
     
     # OpenAI Configuration

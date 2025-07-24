@@ -18,6 +18,12 @@ SRG RM Copilot is a production-ready Python package that provides ETL capabiliti
 - ✅ Pre-commit hooks and code quality tools configured
 - ✅ MIT License and detailed README documentation
 - ✅ All dependencies resolved and installed correctly
+- ✅ Added mock mode (`--mock` flag and `WHEELHOUSE_MOCK=1` env var) for testing without API calls
+- ✅ Created fixture file `tests/fixtures/wheelhouse_listings.json` with sample data
+- ✅ Made `WHEELHOUSE_BASE_URL` configurable via environment variable
+- ✅ Removed `date` parameter from listings API endpoint per requirements
+- ✅ Enhanced error logging with status codes and response text (up to 500 chars)
+- ✅ Added test coverage for mock mode functionality
 
 ## User Preferences
 
@@ -47,18 +53,25 @@ Preferred communication style: Simple, everyday language.
 - Required: `WHEELHOUSE_API_KEY`, `WHEELHOUSE_USER_API_KEY`
 - Optional: `OPENAI_API_KEY` for AI features
 - Configurable data paths, batch sizes, retry settings
+- **NEW**: `WHEELHOUSE_BASE_URL` environment variable for API endpoint configuration
+- **NEW**: `WHEELHOUSE_MOCK` environment variable (set to "1") for mock mode
 
 ### 2. Wheelhouse API Client (`wheelhouse.py`)
 - HTTP client with automatic retry logic for rate limiting (429 errors)
 - Exponential backoff using tenacity library
 - Robust error handling with custom exception types
 - Session management with connection pooling
+- **UPDATED**: Enhanced error logging includes status codes and up to 500 chars of response text
+- **UPDATED**: Base URL now configurable via `WHEELHOUSE_BASE_URL` env var
+- **UPDATED**: Removed `date` parameter from listings endpoint per API requirements
 
 ### 3. ETL Processor (`etl.py`)
 - Extracts data from Wheelhouse API by date
 - Transforms data into structured format
 - Loads into Parquet files with directory structure: `/data/raw/{listing_id}/{YYYY-MM-DD}.parquet`
 - Supports dry-run mode for testing
+- **NEW**: Mock mode support - loads data from `tests/fixtures/wheelhouse_listings.json` when enabled
+- **NEW**: Can be run without API calls using `--mock` flag or `WHEELHOUSE_MOCK=1`
 
 ### 4. Health Monitoring (`health.py`)
 - Scans data directory for file counts and sizes
@@ -76,6 +89,7 @@ Preferred communication style: Simple, everyday language.
 - Health check command for monitoring
 - America/Chicago timezone handling for date defaults
 - Verbose logging and dry-run options
+- **NEW**: `--mock` flag for testing without API calls
 
 ## Data Flow
 

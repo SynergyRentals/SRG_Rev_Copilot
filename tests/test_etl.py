@@ -42,6 +42,19 @@ def etl_processor(temp_config):
 
 
 @pytest.fixture
+def mock_config(temp_config):
+    """Create a test configuration with mock mode enabled."""
+    temp_config.wheelhouse_mock = True
+    return temp_config
+
+
+@pytest.fixture
+def mock_etl_processor(mock_config):
+    """Create a test ETL processor in mock mode."""
+    return ETLProcessor(mock_config)
+
+
+@pytest.fixture
 def sample_listing_data():
     """Sample listing data for testing."""
     return [
@@ -301,6 +314,35 @@ class TestETLProcessor:
             assert result["total_dates_failed"] == 1
             assert "2025-01-02" in result["results_by_date"]
             assert "error" in result["results_by_date"]["2025-01-02"]
+    
+    def test_process_date_mock_mode(self, mock_etl_processor):
+        """Test processing in mock mode."""
+        # Ensure fixture file exists
+        fixture_path = Path("tests/fixtures/wheelhouse_listings.json")
+        assert fixture_path.exists(), "Mock fixture file should exist"
+        
+        result = mock_etl_processor.process_date("2025-01-01", dry_run=False)
+        
+        # Check result structure
+        assert result["total_listings"] == 3  # Based on fixture data
+        assert result["unique_listing_ids"] == 3
+        assert result["files_written"] == 3
+        assert len(result["file_paths"]) == 3
+        
+        # Check that the data processed matches fixture data
+        expected_listing_ids = ["listing_001", "listing_002", "listing_003"]
+        for expected_id in expected_listing_ids:
+            assert any(expected_id in path for path in result["file_paths"])
+    
+    def test_mock_data_loading(self, mock_etl_processor):
+        """Test loading data from fixture file."""
+        listings = mock_etl_processor._load_mock_data()
+        
+        assert len(listings) == 3
+        assert listings[0]["id"] == "listing_001"
+        assert listings[0]["name"] == "Cozy Downtown Apartment"
+        assert listings[1]["id"] == "listing_002"
+        assert listings[2]["id"] == "listing_003"
     
     def test_data_type_conversion(self, etl_processor):
         """Test proper data type conversion during transformation."""

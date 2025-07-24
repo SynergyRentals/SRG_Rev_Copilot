@@ -5,6 +5,7 @@ This module handles the extraction, transformation, and loading of Wheelhouse da
 into Parquet files with proper directory structure and error handling.
 """
 
+import json
 import logging
 import os
 from datetime import datetime
@@ -32,9 +33,12 @@ class ETLProcessor:
             config: Configuration object
         """
         self.config = config
-        self.wheelhouse_client = WheelhouseClient(config)
+        self.wheelhouse_client = WheelhouseClient(config) if not config.wheelhouse_mock else None
         
-        logger.info("ETL processor initialized")
+        if config.wheelhouse_mock:
+            logger.info("ETL processor initialized in MOCK mode")
+        else:
+            logger.info("ETL processor initialized")
     
     def _create_directory_structure(self, listing_id: str) -> Path:
         """
@@ -62,13 +66,14 @@ class ETLProcessor:
         """
         if not listings:
             # Return empty DataFrame with expected schema
-            return pd.DataFrame(columns=[
+            columns = [
                 "listing_id", "title", "price", "location", "bedrooms", "bathrooms",
                 "property_type", "listing_date", "last_updated", "amenities",
                 "description", "host_id", "availability", "minimum_stay",
                 "maximum_stay", "instant_book", "cancellation_policy",
                 "review_score", "review_count", "latitude", "longitude"
-            ])
+            ]
+            return pd.DataFrame(columns=columns)
         
         # Convert to DataFrame
         df = pd.DataFrame(listings)
@@ -175,6 +180,30 @@ class ETLProcessor:
         logger.debug(f"Grouped {len(listings)} listings into {len(grouped)} unique listing IDs")
         return grouped
     
+    def _load_mock_data(self) -> List[Dict[str, Any]]:
+        """
+        Load mock data from fixture file.
+        
+        Returns:
+            List of mock listing data
+        """
+        fixture_path = Path("tests/fixtures/wheelhouse_listings.json")
+        
+        if not fixture_path.exists():
+            logger.error(f"Mock data fixture not found at {fixture_path}")
+            raise FileNotFoundError(f"Mock data fixture not found at {fixture_path}")
+        
+        try:
+            with open(fixture_path, "r") as f:
+                data = json.load(f)
+            
+            listings = data.get("listings", [])
+            logger.info(f"Loaded {len(listings)} mock listings from fixture")
+            return listings
+        except Exception as e:
+            logger.error(f"Failed to load mock data: {e}")
+            raise
+    
     def process_date(self, date: str, dry_run: bool = False) -> Dict[str, Any]:
         """
         Process all listings for a specific date.
@@ -196,8 +225,12 @@ class ETLProcessor:
         
         try:
             # Fetch all listings for the date
-            logger.info("Fetching listings from Wheelhouse API")
-            listings = self.wheelhouse_client.get_all_listings_for_date(date)
+            if self.config.wheelhouse_mock:
+                logger.info("Loading listings from mock fixture")
+                listings = self._load_mock_data()
+            else:
+                logger.info("Fetching listings from Wheelhouse API")
+                listings = self.wheelhouse_client.get_all_listings_for_date(date)
             
             if not listings:
                 logger.warning(f"No listings found for date {date}")

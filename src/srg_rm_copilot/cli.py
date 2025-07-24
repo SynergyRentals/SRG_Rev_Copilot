@@ -47,6 +47,11 @@ def etl(
         "--dry-run",
         help="Show what would be processed without writing files"
     ),
+    mock: bool = typer.Option(
+        False,
+        "--mock",
+        help="Use mock mode to skip API calls and load sample data from fixtures"
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose", "-v",
@@ -60,6 +65,8 @@ def etl(
         python -m srg_rm_copilot etl
         python -m srg_rm_copilot etl --date 2025-07-01
         python -m srg_rm_copilot etl --date 2025-07-01 --dry-run
+        python -m srg_rm_copilot etl --mock  # Use mock data from fixtures
+        WHEELHOUSE_MOCK=1 python -m srg_rm_copilot etl  # Mock via env var
     """
     # Setup logging
     log_level = logging.DEBUG if verbose else logging.INFO
@@ -83,6 +90,11 @@ def etl(
         logger.info("DRY RUN MODE: No files will be written")
     
     try:
+        # Set mock mode if requested
+        if mock:
+            config.wheelhouse_mock = True
+            logger.info("MOCK MODE: Will use fixture data instead of API calls")
+        
         # Initialize ETL processor
         etl_processor = ETLProcessor(config)
         

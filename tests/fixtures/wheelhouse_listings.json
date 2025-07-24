@@ -1,0 +1,46 @@
+{
+  "listings": [
+    {
+      "id": "listing_001",
+      "name": "Cozy Downtown Apartment",
+      "price_per_night": 150.00,
+      "address": "123 Main St, Chicago, IL 60601",
+      "bedrooms": 2,
+      "bathrooms": 1.5,
+      "room_type": "Entire apartment",
+      "amenities": ["WiFi", "Kitchen", "Parking", "AC"],
+      "created_at": "2024-01-15T10:00:00Z",
+      "updated_at": "2025-07-23T14:30:00Z",
+      "description": "Beautiful downtown apartment with city views"
+    },
+    {
+      "id": "listing_002",
+      "name": "Lakefront Studio",
+      "price_per_night": 120.00,
+      "address": "456 Lakeshore Dr, Chicago, IL 60611",
+      "bedrooms": 0,
+      "bathrooms": 1,
+      "room_type": "Studio",
+      "amenities": ["WiFi", "Gym", "Pool"],
+      "created_at": "2024-02-20T08:00:00Z",
+      "updated_at": "2025-07-22T16:45:00Z",
+      "description": "Modern studio with lake views"
+    },
+    {
+      "id": "listing_003",
+      "name": "Suburban Family Home",
+      "price_per_night": 200.00,
+      "address": "789 Oak Ave, Evanston, IL 60201",
+      "bedrooms": 4,
+      "bathrooms": 2.5,
+      "room_type": "Entire house",
+      "amenities": ["WiFi", "Kitchen", "Parking", "Backyard", "Washer/Dryer"],
+      "created_at": "2024-03-10T12:00:00Z",
+      "updated_at": "2025-07-23T09:15:00Z",
+      "description": "Spacious family home in quiet neighborhood"
+    }
+  ],
+  "total": 3,
+  "limit": 100,
+  "offset": 0
+}
