@@ -35,6 +35,11 @@ SRG RM Copilot is a production-ready Python package that provides ETL capabiliti
 - ✅ Fixed config check tests to properly mock config instance for environment variable testing
 - ✅ All 55 tests now pass with 0 skips, 0 errors, 0 failures
 - ✅ No external HTTP calls during tests (proper mocking with requests.Session.request)
+- ✅ TASK 2 COMPLETED: Fixed CI workflow exit code 64 issue
+- ✅ Replaced invalid `uv python install` with proper `actions/setup-python@v5` action
+- ✅ Fixed both test and security jobs to use standard Python setup
+- ✅ CI workflow now uses proper Python installation before uv setup
+- ✅ All CI steps properly ordered: checkout → setup-python → install-uv → dependencies → tests
 
 ## User Preferences
 

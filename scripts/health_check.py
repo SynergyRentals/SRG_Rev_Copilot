@@ -53,9 +53,9 @@ def main():
         default="json",
         help="Output format (default: json)"
     )
-    
+
     args = parser.parse_args()
-    
+
     # Setup logging
     if args.quiet:
         log_level = logging.ERROR
@@ -63,40 +63,40 @@ def main():
         log_level = logging.DEBUG
     else:
         log_level = logging.INFO
-    
+
     setup_logging(log_level)
     logger = logging.getLogger(__name__)
-    
+
     try:
         # Initialize configuration
         logger.info("Initializing configuration")
         config = Config()
-        
+
         # Initialize health monitor
         logger.info("Initializing health monitor")
         health_monitor = HealthMonitor(config)
-        
+
         # Generate health report
         logger.info("Generating health report")
         report = health_monitor.generate_report()
-        
+
         # Determine output file
         if args.output:
             output_file = args.output
         else:
             output_file = config.get_health_file_path()
-        
+
         logger.info(f"Writing health report to {output_file}")
-        
+
         # Write the report
         health_monitor.write_report(report, output_file)
-        
+
         # Output results based on format
         if args.format == "summary":
             print_summary(report)
         elif not args.quiet:
             print_json_info(report, output_file)
-        
+
         # Exit with appropriate code based on health status
         if report.get("health_status") == "critical":
             logger.error("Health status is CRITICAL")
@@ -107,15 +107,15 @@ def main():
         else:
             logger.info("Health status is HEALTHY")
             sys.exit(0)
-    
+
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         if args.verbose:
             logger.exception("Full traceback:")
-        
+
         if not args.quiet:
             print(f"❌ Health check failed: {e}", file=sys.stderr)
-        
+
         sys.exit(3)
 
 
@@ -130,7 +130,7 @@ def print_summary(report):
     summary = report.get("summary", {})
     freshness = report.get("data_freshness", {})
     coverage = report.get("listing_coverage", {})
-    
+
     # Status indicator
     status_icon = {
         "healthy": "✅",
@@ -138,10 +138,10 @@ def print_summary(report):
         "critical": "❌",
         "unknown": "❓"
     }.get(status, "❓")
-    
+
     print(f"{status_icon} Health Status: {status.upper()}")
     print()
-    
+
     # Issues
     issues = report.get("issues", [])
     if issues:
@@ -149,26 +149,26 @@ def print_summary(report):
         for issue in issues:
             print(f"  • {issue}")
         print()
-    
+
     # Summary statistics
     print("Data Summary:")
     print(f"  Total Files: {summary.get('total_files', 0):,}")
     print(f"  Total Size: {summary.get('total_size_mb', 0):.1f} MB")
     print(f"  Total Rows: {summary.get('total_rows', 0):,}")
     print(f"  Unique Listings: {summary.get('unique_listings', 0):,}")
-    
+
     # Date range
     date_range = summary.get("date_range", {})
     if date_range.get("earliest") and date_range.get("latest"):
         print(f"  Date Range: {date_range['earliest']} to {date_range['latest']}")
-    
+
     print()
-    
+
     # Data freshness
     if freshness.get("has_data"):
         latest_date = freshness.get("latest_date")
         days_old = freshness.get("days_since_latest", 0)
-        
+
         print("Data Freshness:")
         print(f"  Latest Data: {latest_date}")
         if days_old == 0:
@@ -179,35 +179,35 @@ def print_summary(report):
             print(f"  Status: Acceptable ({days_old} days old)")
         else:
             print(f"  Status: Stale ({days_old} days old)")
-        
+
         missing_recent = freshness.get("missing_recent_dates", [])
         if missing_recent:
             print(f"  Missing Recent Dates: {len(missing_recent)} days")
-        
+
         gaps = freshness.get("total_gaps", 0)
         if gaps > 0:
             print(f"  Data Gaps: {gaps} missing dates in range")
-        
+
         print()
-    
+
     # Coverage statistics
     print("Listing Coverage:")
     print(f"  Total Listings: {coverage.get('total_listings', 0):,}")
     print(f"  Avg Dates per Listing: {coverage.get('avg_dates_per_listing', 0):.1f}")
-    
+
     single_date = coverage.get("listings_with_single_date", 0)
     if single_date > 0:
         print(f"  Single-Date Listings: {single_date:,}")
-    
+
     # Most active listings
     most_active = coverage.get("most_active_listings", [])
     if most_active:
         print("  Most Active Listings:")
         for listing in most_active[:3]:
             print(f"    {listing['listing_id']}: {listing['date_count']} dates")
-    
+
     print()
-    
+
     # Report timestamp
     generated_at = report.get("system_info", {}).get("report_generated_at")
     if generated_at:
@@ -224,23 +224,23 @@ def print_json_info(report, output_file):
     """
     status = report.get("health_status", "unknown")
     summary = report.get("summary", {})
-    
+
     status_icon = {
         "healthy": "✅",
         "warning": "⚠️ ",
         "critical": "❌",
         "unknown": "❓"
     }.get(status, "❓")
-    
+
     print(f"{status_icon} Health report generated: {output_file}")
     print(f"Status: {status.upper()}")
     print(f"Files: {summary.get('total_files', 0):,}")
     print(f"Size: {summary.get('total_size_mb', 0):.1f} MB")
-    
+
     date_range = summary.get("date_range", {})
     if date_range.get("earliest") and date_range.get("latest"):
         print(f"Date Range: {date_range['earliest']} to {date_range['latest']}")
-    
+
     # Show issues if any
     issues = report.get("issues", [])
     if issues:

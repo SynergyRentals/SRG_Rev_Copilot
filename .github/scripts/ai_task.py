@@ -19,10 +19,6 @@ Environment Variables:
 
 import json
 import logging
-import os
-import sys
-from pathlib import Path
-from typing import Dict, List, Optional
 
 import requests
 from openai import OpenAI
@@ -36,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 class GitHubAPI:
     """GitHub API client for repository operations."""
-    
+
     def __init__(self, token: str, repository: str):
         self.token = token
         self.repository = repository
@@ -45,15 +41,15 @@ class GitHubAPI:
             "Accept": "application/vnd.github.v3+json",
         }
         self.base_url = "https://api.github.com"
-    
-    def get_issue(self, issue_number: int) -> Dict:
+
+    def get_issue(self, issue_number: int) -> dict:
         """Fetch issue details from GitHub."""
         url = f"{self.base_url}/repos/{self.repository}/issues/{issue_number}"
         response = requests.get(url, headers=self.headers)
         response.raise_for_status()
         return response.json()
-    
-    def create_pull_request(self, title: str, body: str, head: str, base: str = "main") -> Dict:
+
+    def create_pull_request(self, title: str, body: str, head: str, base: str = "main") -> dict:
         """Create a pull request."""
         url = f"{self.base_url}/repos/{self.repository}/pulls"
         data = {
@@ -65,8 +61,8 @@ class GitHubAPI:
         response = requests.post(url, headers=self.headers, json=data)
         response.raise_for_status()
         return response.json()
-    
-    def create_branch(self, branch_name: str, base_sha: str) -> Dict:
+
+    def create_branch(self, branch_name: str, base_sha: str) -> dict:
         """Create a new branch."""
         url = f"{self.base_url}/repos/{self.repository}/git/refs"
         data = {
@@ -76,7 +72,7 @@ class GitHubAPI:
         response = requests.post(url, headers=self.headers, json=data)
         response.raise_for_status()
         return response.json()
-    
+
     def get_main_branch_sha(self) -> str:
         """Get the SHA of the main branch."""
         url = f"{self.base_url}/repos/{self.repository}/git/refs/heads/main"
@@ -87,18 +83,18 @@ class GitHubAPI:
 
 class AITaskProcessor:
     """Processes AI tasks and generates code suggestions."""
-    
+
     def __init__(self, openai_api_key: str):
         self.client = OpenAI(api_key=openai_api_key)
-    
-    def analyze_issue(self, issue_data: Dict) -> Dict:
+
+    def analyze_issue(self, issue_data: dict) -> dict:
         """Analyze GitHub issue and generate development plan."""
         issue_content = f"""
 Title: {issue_data['title']}
 Body: {issue_data['body']}
 Labels: {[label['name'] for label in issue_data.get('labels', [])]}
 """
-        
+
         prompt = f"""
 You are a senior software engineer analyzing a GitHub issue for the SRG RM Copilot project.
 This is a Python package for Wheelhouse data ETL with AI automation capabilities.
@@ -125,7 +121,7 @@ Format your response as JSON with the following structure:
     "estimated_complexity": "low|medium|high"
 }}
 """
-        
+
         try:
             response = self.client.chat.completions.create(
                 model="gpt-4",
@@ -136,10 +132,10 @@ Format your response as JSON with the following structure:
                 temperature=0.1,
                 max_tokens=2000
             )
-            
+
             analysis_text = response.choices[0].message.content
             return json.loads(analysis_text)
-            
+
         except Exception as e:
             logger.error(f"Error analyzing issue: {e}")
             return {
@@ -151,17 +147,17 @@ Format your response as JSON with the following structure:
                 "risks": ["AI analysis failed"],
                 "estimated_complexity": "unknown"
             }
-    
-    def generate_code_diff(self, analysis: Dict, current_codebase: Dict[str, str]) -> Dict[str, str]:
+
+    def generate_code_diff(self, analysis: dict, current_codebase: dict[str, str]) -> dict[str, str]:
         """Generate code changes based on analysis."""
         if not analysis.get("files_to_modify"):
             return {}
-        
+
         changes = {}
-        
+
         for file_path in analysis["files_to_modify"]:
             current_content = current_codebase.get(file_path, "")
-            
+
             prompt = f"""
 Based on this analysis:
 Summary: {analysis['summary']}
@@ -184,11 +180,11 @@ Return only the complete file content, properly formatted."""
                     temperature=0.1,
                     max_tokens=3000
                 )
-                
+
                 changes[file_path] = response.choices[0].message.content
-                
+
             except Exception as e:
                 logger.error(f"Error generating code for {file_path}: {e}")
                 changes[file_path] = f"# Error generating code: {e}\n{current_content}"
-        
+
         return changes

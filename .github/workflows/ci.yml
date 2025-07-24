@@ -16,13 +16,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
     - name: Install uv
       uses: astral-sh/setup-uv@v2
       with:
         version: "latest"
-
-    - name: Set up Python ${{ matrix.python-version }}
-      run: uv python install ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
@@ -42,7 +45,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        uv run pytest --cov=src/srg_rm_copilot --cov-report=xml
+        uv run pytest -q --cov=src/srg_rm_copilot --cov-report=xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -55,11 +58,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: 'pip'
+
     - name: Install uv
       uses: astral-sh/setup-uv@v2
-
-    - name: Set up Python
-      run: uv python install 3.12
+      with:
+        version: "latest"
 
     - name: Install dependencies
       run: uv sync --dev

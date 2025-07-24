@@ -1,0 +1,75 @@
+TASK 1: Fix CI workflow (exit code 64) and stabilize GitHub Actions
+
+Context:
+- CI failed with exit code 64. Logs show the step:
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+  That command is invalid for uv and caused the failure.
+- We’re using uv but we can let GitHub Actions install Python with actions/setup-python and then use uv (or plain pip) for deps.
+- Tests pass locally (33 passed, 22 skipped for now). We just need CI green.
+
+What to do:
+
+1. Update `.github/workflows/ci.yml`
+   - Remove/replace the `uv python install` step.
+   - Use:
+     ```yaml
+     - name: Set up Python ${{ matrix.python-version }}
+       uses: actions/setup-python@v5
+       with:
+         python-version: ${{ matrix.python-version }}
+         cache: 'pip'
+     ```
+   - Keep uv if we need it:
+     ```yaml
+     - name: Install uv
+       uses: astral-sh/setup-uv@v2
+       with:
+         version: "latest"
+     ```
+   - Install deps with ONE method. Prefer uv:
+     ```yaml
+     - name: Install dependencies
+       run: |
+         uv pip install -e .
+         uv pip install pytest pytest-cov pre-commit requests-mock
+     ```
+     (or, if simpler, skip uv entirely and just `pip install`.)
+
+   - Run tests:
+     ```yaml
+     - name: Run tests
+       run: pytest -q
+     ```
+
+   - Optionally run pre-commit (if hooks work in CI):
+     ```yaml
+     - name: Run pre-commit
+       run: pre-commit run --all-files --show-diff-on-failure
+     ```
+
+2. Make sure the job fails loudly on test errors, not on mis-used commands.
+   - Use `set -euo pipefail` if you add multi-line bash sections.
+
+3. Secrets
+   - If any step needs Wheelhouse/OpenAI secrets, guard it or skip in CI if missing. Otherwise, just run tests that don’t need live API.
+
+Deliverables:
+- List of files changed (especially `.github/workflows/ci.yml`) with a short summary of edits.
+- Final YAML snippet of the workflow.
+- Exact shell commands I need to run locally (git add/commit/push).
+- Screenshot or copy of a successful `pytest -q` run from CI (paste the last few lines).
+
+Acceptance Criteria:
+- GitHub Actions run completes successfully (green check).
+- No exit code 64. The offending command is gone.
+- Tests run and pass/skips are acceptable for now.
+- Pre-commit either passes or is documented as skipped.
+
+Return:
+1. Changed files summary
+2. Updated CI YAML section
+3. Commands to commit & push
+4. Proof of green CI run (log excerpt)
+
+Begin.
