@@ -25,7 +25,7 @@ class Config(BaseModel):
     )
     
     wheelhouse_base_url: str = Field(
-        default="https://api.wheelhouse.com",
+        default="https://api.usewheelhouse.com/wheelhouse_pro_api",
         description="Base URL for Wheelhouse API"
     )
     
