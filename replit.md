@@ -24,6 +24,10 @@ SRG RM Copilot is a production-ready Python package that provides ETL capabiliti
 - ✅ Removed `date` parameter from listings API endpoint per requirements
 - ✅ Enhanced error logging with status codes and response text (up to 500 chars)
 - ✅ Added test coverage for mock mode functionality
+- ✅ Fixed test suite: replaced pytest_httpx with monkeypatch approach for requests mocking
+- ✅ Updated BASE_URL to use default https://api.usewheelhouse.com/wheelhouse_pro_api
+- ✅ Removed @pytest.mark.asyncio from synchronous tests
+- ✅ All 14 wheelhouse client tests now pass successfully
 
 ## User Preferences
 
