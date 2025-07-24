@@ -49,7 +49,9 @@ class GitHubAPI:
         response.raise_for_status()
         return response.json()
 
-    def create_pull_request(self, title: str, body: str, head: str, base: str = "main") -> dict:
+    def create_pull_request(
+        self, title: str, body: str, head: str, base: str = "main"
+    ) -> dict:
         """Create a pull request."""
         url = f"{self.base_url}/repos/{self.repository}/pulls"
         data = {
@@ -96,7 +98,8 @@ Labels: {[label['name'] for label in issue_data.get('labels', [])]}
 """
 
         prompt = f"""
-You are a senior software engineer analyzing a GitHub issue for the SRG RM Copilot project.
+You are a senior software engineer analyzing a GitHub issue for the SRG RM Copilot
+project.
 This is a Python package for Wheelhouse data ETL with AI automation capabilities.
 
 Issue to analyze:
@@ -126,7 +129,13 @@ Format your response as JSON with the following structure:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a senior software engineer specializing in Python development and ETL systems."},
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a senior software engineer specializing in "
+                            "Python development and ETL systems."
+                        )
+                    },
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.1,
@@ -148,7 +157,9 @@ Format your response as JSON with the following structure:
                 "estimated_complexity": "unknown"
             }
 
-    def generate_code_diff(self, analysis: dict, current_codebase: dict[str, str]) -> dict[str, str]:
+    def generate_code_diff(
+        self, analysis: dict, current_codebase: dict[str, str]
+    ) -> dict[str, str]:
         """Generate code changes based on analysis."""
         if not analysis.get("files_to_modify"):
             return {}
@@ -174,7 +185,13 @@ Return only the complete file content, properly formatted."""
                 response = self.client.chat.completions.create(
                     model="gpt-4",
                     messages=[
-                        {"role": "system", "content": "You are a senior software engineer. Generate complete, working code."},
+                        {
+                            "role": "system",
+                            "content": (
+                                "You are a senior software engineer. "
+                                "Generate complete, working code."
+                            )
+                        },
                         {"role": "user", "content": prompt}
                     ],
                     temperature=0.1,

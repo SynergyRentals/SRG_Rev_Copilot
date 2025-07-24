@@ -237,8 +237,8 @@ class ETLProcessor:
         # Validate date format
         try:
             datetime.strptime(date, "%Y-%m-%d")
-        except ValueError:
-            raise ValueError(f"Invalid date format: {date}. Expected YYYY-MM-DD")
+        except ValueError as e:
+            raise ValueError(f"Invalid date format: {date}. Expected YYYY-MM-DD") from e
 
         try:
             # Fetch all listings for the date

@@ -257,7 +257,8 @@ def retry_on_exception(
                     raise e
 
                 logging.warning(
-                    f"Attempt {attempt + 1} failed: {e}. Retrying in {current_delay}s..."
+                    f"Attempt {attempt + 1} failed: {e}. "
+                    f"Retrying in {current_delay}s..."
                 )
                 time.sleep(current_delay)
                 current_delay *= backoff_factor

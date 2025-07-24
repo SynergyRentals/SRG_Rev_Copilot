@@ -129,7 +129,7 @@ class HealthMonitor:
 
         # Unique listings
         unique_listings = len(
-            set(f["listing_id"] for f in files_info if f["listing_id"] != "unknown")
+            {f["listing_id"] for f in files_info if f["listing_id"] != "unknown"}
         )
 
         # Date range
@@ -395,7 +395,10 @@ class HealthMonitor:
             elif freshness["days_since_latest"] and freshness["days_since_latest"] > 2:
                 return f"⚠️  Data is {freshness['days_since_latest']} days old"
             else:
-                return f"✅ Healthy ({summary['total_files']} files, latest: {freshness['latest_date']})"
+                return (
+                    f"✅ Healthy ({summary['total_files']} files, "
+                    f"latest: {freshness['latest_date']})"
+                )
 
         except Exception as e:
             return f"❌ Health check failed: {e}"

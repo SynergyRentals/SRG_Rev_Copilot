@@ -21,9 +21,10 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
-from srg_rm_copilot.config import Config
-from srg_rm_copilot.health import HealthMonitor
-from srg_rm_copilot.utils import setup_logging
+# noqa: E402 - Module level imports after sys.path modification
+from srg_rm_copilot.config import Config  # noqa: E402
+from srg_rm_copilot.health import HealthMonitor  # noqa: E402
+from srg_rm_copilot.utils import setup_logging  # noqa: E402
 
 
 def main():
@@ -122,7 +123,7 @@ def main():
 def print_summary(report):
     """
     Print a human-readable summary of the health report.
-    
+
     Args:
         report: Health report dictionary
     """
@@ -217,7 +218,7 @@ def print_summary(report):
 def print_json_info(report, output_file):
     """
     Print information about the JSON report that was written.
-    
+
     Args:
         report: Health report dictionary
         output_file: Path where the report was written

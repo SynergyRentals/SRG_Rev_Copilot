@@ -1,7 +1,8 @@
 """
 SRG RM Copilot
 
-Production-ready Python package + CLI + ETL for Wheelhouse data with AI-powered development automation.
+Production-ready Python package + CLI + ETL for Wheelhouse data with AI-powered
+development automation.
 """
 
 __version__ = "0.1.0"

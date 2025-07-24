@@ -154,7 +154,7 @@ class WheelhouseClient:
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Request failed: {e}")
-            raise WheelhouseAPIError(f"Request failed: {e}")
+            raise WheelhouseAPIError(f"Request failed: {e}") from e
 
     def get_listings(
         self,

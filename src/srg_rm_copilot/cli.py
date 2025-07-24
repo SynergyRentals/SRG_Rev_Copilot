@@ -18,7 +18,7 @@ from .utils import setup_logging
 
 app = typer.Typer(
     name="srg-rm-copilot",
-    help="Production-ready Python package + CLI + ETL for Wheelhouse data with AI automation",
+    help="Production-ready Python package + CLI + ETL for Wheelhouse data with AI",
     no_args_is_help=True,
 )
 
@@ -39,7 +39,7 @@ def etl(
     date: str | None = typer.Option(
         None,
         "--date",
-        help="Date to process (YYYY-MM-DD). Default: yesterday in America/Chicago timezone",
+        help="Date to process (YYYY-MM-DD). Default: yesterday in America/Chicago",
     ),
     dry_run: bool = typer.Option(
         False, "--dry-run", help="Show what would be processed without writing files"
@@ -78,7 +78,7 @@ def etl(
         datetime.strptime(date, "%Y-%m-%d")
     except ValueError:
         typer.echo(f"Error: Invalid date format '{date}'. Use YYYY-MM-DD.", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     logger.info(f"Starting ETL process for date: {date}")
     if dry_run:
@@ -114,7 +114,7 @@ def etl(
     except Exception as e:
         logger.error(f"ETL process failed: {e}")
         typer.echo(f"Error: {e}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
 
 @app.command()
@@ -161,13 +161,14 @@ def health(
         typer.echo(f"Total files: {report['summary']['total_files']}")
         typer.echo(f"Total size: {report['summary']['total_size_mb']:.2f} MB")
         typer.echo(
-            f"Date range: {report['summary']['date_range']['earliest']} to {report['summary']['date_range']['latest']}"
+            f"Date range: {report['summary']['date_range']['earliest']} to "
+            f"{report['summary']['date_range']['latest']}"
         )
 
     except Exception as e:
         logger.error(f"Health report generation failed: {e}")
         typer.echo(f"Error: {e}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
 
 @app.command()
@@ -179,7 +180,7 @@ def config_check() -> None:
         python -m srg_rm_copilot config-check
     """
     setup_logging(logging.INFO)
-    logger = logging.getLogger(__name__)
+    logging.getLogger(__name__)
 
     typer.echo("Checking configuration...")
 
@@ -206,7 +207,7 @@ def config_check() -> None:
     try:
         from .wheelhouse import WheelhouseClient
 
-        client = WheelhouseClient(config)
+        WheelhouseClient(config)
 
         # This would be a simple connectivity test
         # For now, just check that client initializes
@@ -214,7 +215,7 @@ def config_check() -> None:
 
     except Exception as e:
         typer.echo(f"❌ Wheelhouse client error: {e}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     # Check data directory
     data_dir = Path(config.data_base_path)

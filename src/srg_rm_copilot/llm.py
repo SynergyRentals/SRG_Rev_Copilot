@@ -116,7 +116,7 @@ class LLMClient:
 
         except Exception as e:
             logger.error(f"Error generating completion: {e}")
-            raise LLMError(f"Failed to generate completion: {e}")
+            raise LLMError(f"Failed to generate completion: {e}") from e
 
     def analyze_code(
         self, code: str, language: str = "python", analysis_type: str = "review"
@@ -132,17 +132,19 @@ class LLMClient:
         Returns:
             Analysis results
         """
-        system_message = f"""You are a senior software engineer specializing in {language} development.
-        Provide a thorough {analysis_type} of the given code, focusing on:
-        - Code quality and best practices
-        - Potential bugs or security issues
-        - Performance considerations
-        - Maintainability and readability
-        - Suggestions for improvement
-        
-        Be specific and actionable in your feedback."""
+        system_message = (
+            f"You are a senior software engineer specializing in {language} "
+            "development. "
+            f"Provide a thorough {analysis_type} of the given code, focusing on: "
+            "code quality and best practices, potential bugs or security issues, "
+            "performance considerations, maintainability and readability, and "
+            "suggestions for improvement. Be specific and actionable in your feedback."
+        )
 
-        prompt = f"Please {analysis_type} this {language} code:\n\n```{language}\n{code}\n```"
+        prompt = (
+            f"Please {analysis_type} this {language} code:\n\n"
+            f"```{language}\n{code}\n```"
+        )
 
         return self.generate_completion(
             prompt=prompt,
@@ -165,17 +167,18 @@ class LLMClient:
         Returns:
             Generated test code
         """
-        system_message = f"""You are a senior software engineer specializing in {language} testing.
-        Generate comprehensive test cases using {framework} for the given code.
-        Include:
-        - Happy path tests
-        - Edge case tests
-        - Error condition tests
-        - Mock usage where appropriate
-        
-        Follow best practices for {framework} and write clean, maintainable test code."""
+        system_message = (
+            f"You are a senior software engineer specializing in {language} testing. "
+            f"Generate comprehensive test cases using {framework} for the given code. "
+            "Include happy path tests, edge case tests, error condition tests, and "
+            f"mock usage where appropriate. Follow best practices for {framework} "
+            "and write clean, maintainable test code."
+        )
 
-        prompt = f"Generate {framework} tests for this {language} code:\n\n```{language}\n{code}\n```"
+        prompt = (
+            f"Generate {framework} tests for this {language} code:\n\n"
+            f"```{language}\n{code}\n```"
+        )
 
         return self.generate_completion(
             prompt=prompt,
@@ -201,10 +204,15 @@ class LLMClient:
         Returns:
             Error explanation and solutions
         """
-        system_message = f"""You are a helpful debugging assistant for {language} development.
-        Explain errors clearly and provide actionable solutions."""
+        system_message = (
+            f"You are a helpful debugging assistant for {language} development. "
+            "Explain errors clearly and provide actionable solutions."
+        )
 
-        prompt = f"Explain this {language} error and provide solutions:\n\nError: {error_message}"
+        prompt = (
+            f"Explain this {language} error and provide solutions:\n\n"
+            f"Error: {error_message}"
+        )
 
         if code_context:
             prompt += f"\n\nCode context:\n```{language}\n{code_context}\n```"
@@ -230,10 +238,16 @@ class LLMClient:
         Returns:
             Generated documentation
         """
-        system_message = f"""You are a technical writer specializing in {language} documentation.
-        Generate clear, comprehensive {doc_type} documentation following best practices."""
+        system_message = (
+            f"You are a technical writer specializing in {language} documentation. "
+            f"Generate clear, comprehensive {doc_type} documentation following "
+            "best practices."
+        )
 
-        prompt = f"Generate {doc_type} documentation for this {language} code:\n\n```{language}\n{code}\n```"
+        prompt = (
+            f"Generate {doc_type} documentation for this {language} code:\n\n"
+            f"```{language}\n{code}\n```"
+        )
 
         return self.generate_completion(
             prompt=prompt,
@@ -260,7 +274,10 @@ class LLMClient:
         Provide specific, actionable suggestions to improve the code,
         focusing on {focus_area} aspects."""
 
-        prompt = f"Suggest improvements for this {language} code (focus: {focus_area}):\n\n```{language}\n{code}\n```"
+        prompt = (
+            f"Suggest improvements for this {language} code (focus: {focus_area}):\n\n"
+            f"```{language}\n{code}\n```"
+        )
 
         return self.generate_completion(
             prompt=prompt,
