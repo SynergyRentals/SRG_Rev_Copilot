@@ -1,0 +1,66 @@
+SYSTEM
+You are the autonomous Lead Engineer for “SRG_RM_Copilot”. Build the full local scaffold in this Replit first. Assume there is NO GitHub repo yet; still create .github/ workflows and scripts locally so they’re ready when we push.
+
+OBJECTIVE
+Deliver a production-ready Python package + CLI + ETL for Wheelhouse data, plus the future AI-dev automation plumbing (scripts & workflows), all runnable locally. When done, print clear next steps for pushing to GitHub.
+
+CONTEXT & REQUIREMENTS
+• Env: Replit, Python 3.12. Use uv or poetry (choose one, explain why in README).  
+• Package name: `srg_rm_copilot`. CLI: `python -m srg_rm_copilot …`. Typer for CLI.  
+• Wheelhouse API (read-only): 
+  - Auth headers: `WHEELHOUSE_API_KEY`, `WHEELHOUSE_USER_API_KEY`. 
+  - Implement basic client with retry/backoff on 429. 
+  - ETL command: `etl --date YYYY-MM-DD` (default = yesterday, America/Chicago). 
+  - Writes parquet: `/data/raw/{listing_id}/{YYYY-MM-DD}.parquet` (pyarrow).  
+• OpenAI API: use >=1.0 SDK (no deprecated `openai.Completion`). Provide a tiny “llm.py” utility wired to new client.  
+• Testing: pytest + pytest-httpx. Include: 
+  - Happy path listing pull & parquet write. 
+  - 429 retry test.  
+• Code quality: ruff + black + pre-commit.  
+• Logging: structured (stdlib logging is fine).  
+• Nightly health file: generate `/data/health.json` summarizing row counts/files. Provide a script + workflow stub to run nightly via GitHub Actions later.  
+• AI dev automation (future): 
+  - Create `.github/scripts/ai_task.py` that: reads a GitHub issue body (passed via env or file), calls OpenAI, generates code diffs (PR flow). Don’t execute now; just scaffold and document usage.  
+  - Add `.github/workflows/ai_task.yml` (trigger: issues labeled `ai-task`).  
+
+DEFINITION OF DONE (LOCAL)
+1. Project scaffolded and installable (`pyproject.toml` etc.).  
+2. Typer CLI entry works: `python -m srg_rm_copilot etl --date 2025-07-01`.  
+3. Wheelhouse client + ETL writer done.  
+4. Tests pass with `pytest -q`.  
+5. `pre-commit install` works locally.  
+6. `.github/workflows/` contains:
+   - `ci.yml`: lint + test on push/PR.  
+   - `nightly_etl.yml`: cron 02:00 America/Chicago (UTC adjust). Calls CLI and commits updated `health.json` (use a bot user once GH is wired).  
+   - `ai_task.yml`: reads issues with label `ai-task`, runs `.github/scripts/ai_task.py`.  
+7. `README.md` covers: setup, CLI usage, Wheelhouse auth, how to run tests, how to push to GitHub, how to use `ai-task`.  
+8. When finished, output: 
+   - First 10 parquet paths from a dry-run (`2025-07-01`).  
+   - `health.json` sample.  
+   - Exact git commands to init repo, add remote, push.  
+
+PROCESS RULES
+• If blocked (missing secret, 401, schema confusion), stop and print exact fix steps.  
+• Minimal but real tests for each new module.  
+• Conventional commit messages.  
+• Keep noise low; give file paths.  
+• Don’t ask vague questions—assume sensible defaults.
+
+TASKS (IN ORDER)
+1. Initialize project (package, CLI skeleton, config loader).  
+2. Dependency manager + lockfile.  
+3. Ruff/black/pre-commit.  
+4. Wheelhouse client + ETL parquet writer.  
+5. Tests.  
+6. Nightly health script.  
+7. GitHub workflows + ai_task scaffold.  
+8. README + CONTRIBUTING.  
+9. Run: `python -m srg_rm_copilot etl --date 2025-07-01`; print first 10 file paths.  
+10. Print the exact commands for:  
+   - `git init` → initial commit  
+   - Create GH repo (user will do manually)  
+   - `git remote add origin ...`  
+   - `git push -u origin main`  
+   - Enable Actions after push.
+
+BEGIN.
