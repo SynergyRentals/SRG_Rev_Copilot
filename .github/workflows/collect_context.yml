@@ -1,0 +1,83 @@
+name: collect_context
+
+on:
+  workflow_dispatch: {}   # manual run from Actions tab
+
+jobs:
+  build-context:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tooling (best‑effort)
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest ruff black mypy || true
+
+      - name: Generate context bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="context_report"
+          rm -rf "$OUT" && mkdir -p "$OUT"
+
+          echo "== GIT ==" > "$OUT/git_state.txt"
+          { git rev-parse --short HEAD; git branch --show-current || true; git status --porcelain || true; } >> "$OUT/git_state.txt" 2>&1
+
+          # Shallow file tree (ignore heavy dirs)
+          sudo apt-get update >/dev/null 2>&1 || true
+          sudo apt-get install -y tree >/dev/null 2>&1 || true
+          { tree -a -I '.git|.venv|__pycache__|.pytest_cache|.mypy_cache|data|dist|build' -L 3 || true; } > "$OUT/tree.txt" 2>&1
+
+          copy() { if [ -e "$1" ]; then mkdir -p "$(dirname "$OUT/$1")"; rsync -a --prune-empty-dirs --relative "$1" "$OUT"/; fi; }
+
+          copy pyproject.toml
+          copy poetry.lock
+          copy uv.lock
+          copy requirements.txt
+          copy requirements-dev.txt
+          copy requirements/
+          copy .pre-commit-config.yaml
+          copy .replit
+          copy replit.nix
+          copy Dockerfile
+          copy Makefile
+          copy README.md
+          copy README.MD
+          copy README.rst
+          copy .github/workflows/
+          copy src/
+          copy tests/
+          copy scripts/
+
+          # Lint/format/type checks (don’t fail the job if tools/code missing)
+          { ruff --version && ruff check .; } > "$OUT/ruff.txt" 2>&1 || true
+          { black --version && black --check .; } > "$OUT/black.txt" 2>&1 || true
+          { mypy --version && mypy src; } > "$OUT/mypy.txt" 2>&1 || true
+
+          # Tests
+          { pytest -q; } > "$OUT/pytest.txt" 2>&1 || true
+          { pytest -q -k "not slow" --maxfail=1 -vv; } > "$OUT/pytest_quick.txt" 2>&1 || true
+
+          # Python + deps
+          python -V > "$OUT/python.txt" 2>&1 || true
+          pip list --format=freeze > "$OUT/pip_freeze.txt" 2>&1 || true
+
+          # Try CLI help (adjust module name if different)
+          { python -m srg_rev_copilot --help; } > "$OUT/cli_help.txt" 2>&1 || true
+
+          echo "DONE" > "$OUT/_done.txt"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: context_report
+          path: context_report/
+          retention-days: 7
