@@ -58,6 +58,7 @@ packages = ["src/srg_rm_copilot"]
 [tool.hatch.build.targets.sdist]
 include = [
     "/src",
+
     "/tests",
     "/README.md",
     "/LICENSE",
