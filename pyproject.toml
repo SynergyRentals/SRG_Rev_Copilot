@@ -41,11 +41,11 @@ dev = [
   "mypy>=1.10",
   "types-requests",
   "types-pytz",
-]"types-pytz",
+
 ]
 
 [project.urls]
-Homepage = "https://github.com/srg/srg-rm-copilot"
+Ho//github.com/srg/srg-rm-copilot"
 Repository = "https://github.com/srg/srg-rm-copilot.git"
 Issues = "https://github.com/srg/srg-rm-copilot/issues"
 
