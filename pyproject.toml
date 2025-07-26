@@ -32,16 +32,16 @@ dependencies = [
     "tenacity>=9",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "pytest>=8.2",
-    "pytest-cov>=5",
-    "pytest-httpx>=0.30; python_version < '3.13'",  # if you mock HTTPX
-    "ruff>=0.3",
-    "black>=24",
-    "mypy>=1.10",
-    "types-requests",
-    "types-pytz",
+  "pytest>=8.2",
+  "pytest-cov>=5",
+  "ruff>=0.5.4",
+  "black>=24.4",
+  "mypy>=1.10",
+  "types-requests",
+  "types-pytz",
+]"types-pytz",
 ]
 
 [project.urls]
