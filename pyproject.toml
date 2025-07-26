@@ -44,17 +44,20 @@ dev = [
 
 ]
 
+
+
 [project.urls]
-Ho//github.com/srg/srg-rm-copilot"
+
+Homepage = "https://github.com/srg/srg-rm-copilot"
 Repository = "https://github.com/srg/srg-rm-copilot.git"
 Issues = "https://github.com/srg/srg-rm-copilot/issues"
+
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/srg_rm_copilot"]
 
-[tool.hatch.build.targets.sdist]
+#Homepage = "https://github.com/srg/srg-rm-copilot"
 include = [
-    "/src",
     "/tests",
     "/README.md",
     "/LICENSE",
